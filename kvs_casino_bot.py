@@ -18,18 +18,18 @@ if not TOKEN:
 
 SPREADSHEET_ID = "1uQXxwPm-HkrAD_hErpjtInBFwOaYJtTHkgqqfJ0_6V0"
 
-# ============= ВСТРОЕННЫЙ КЛЮЧ (как в Снимочках) =============
+# ============= НОВЫЙ КЛЮЧ (от 13.04.2026, проект kvs-casino) =============
 KEY_JSON = '''{
   "type": "service_account",
-  "project_id": "kvs-kasik",
-  "private_key_id": "c36b9c1733e49d42a8b22038c7a0cf0349f3d652",
-  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDTXi6J+Z9abMhW\\ng7+pVAOwi+z9hF49T8Z1cFEAZYxXf7Av1K0msCOfXxuQ1goWqIsfLhiyMYG8fSHI\\nneI2zT+cYwhGrKIj2jDC++tzv7MQ2hXvt1ZQr54NFgjVBChISpGYNNelLi658nrv\\n73Tk0oJIEW7EetA6tE/Hr6nJGeK12sIgy3dI/BHfOq9kEYl3nwlMoIu4Cj4OB+TJ\\ncQzghyMo1Gr45P0/gXWpHqYL13DBhYH02cf4mhxnkKxJoSN+GaPw8yXhoLszAXJJ\\n93X5NXM3aMRfEsrYHQOKON9Xg12LA/NLt1NWv6WPeBgLjw26skPAyTuKvdlODw2A\\npay0da6NAgMBAAECggEAClpQmT16yqkNXv9xAdA1pg4Ue45iN0qTA+mObiCLMTX1\\n4UHfgUebVxEHfp6dO+LhfZN6bi/ylNLkNrlU/S4scXKAU0XdYzgqr0I7lB3NnYOx\\nE169gZI4gZeUsypS9seAPh5IebS7YSw5TUtDRHnzG6iO7ly9mkJ+rd8yx8DW0+Ve\\nVfgzXmfwVdFADeCVOK83qEOX4y+jpt0vWc485YWz+XEp35Z5+0pc6wD8SVi1qRb7\\nlna7I7apWO3Ekfg+tDwJNOIGx85wSws+x67Jvt8jJGIVxIpF8feultj1ikPMwJ9G\\nQo9Bqdlac/yAF1DlJhKCI51gneSMFM42w1iyfxHrWQKBgQDth4dU21XFB8ZIi+eV\\nwT9COnMWQWsqVx6OUdBxtI/b3UNBgLOzdCjVbdkK+/+rcHfmwPn1PhSrWi6imq9f\\nY5JHYPID6BdR6wQmAIk3+yUnGiFd4zR1JsUAKVgye6ScuKG/ds4tOYKfRyKWN9c9\\nx1KgOwvRISmYvL86tDEjr8MtCwKBgQDjzdvfjH0W8xTe2/DsHWCMQZv7ORdvEZnj\\njBOM/sd32hIYBh763BD+OntqEYSXE8DU/IB5DaMvDSJvyQmjNUQYs3mVTsXaumON\\ncu975/tmyhSqs18sXNZ0GpLOvC6VFbDtBra6haF8hp+CeswILXWiE7wfBsE71Y4Q\\nPedjjdXhxwKBgQDUvDVwwqCmvrfP8b2QWmuVnVPF8wFQAobTYGMX82eEuz6pQ+Ou\\nLbMEtEVXmSr7GNfKS7uS8e8BKNvrti6reDpiw2j+Jrf8Hkiw4HoFMWGtC7ImrH8n\\nDXoTEvRzAloEIzh6iqVNy9w5WzSW5ZxZMFPIPhnvS4w9x45dvVTlaV2c0QKBgQDa\\nP6vbrPlbN2BTc1yKmkqZlXIfaj8tRiutedJxTtdD2EVlhte/d39AUj9TC52AMIia\\nhZ+AWrRwq6DGgFEfcDThhXGCvomIWPJv3iHbEBIoFItgT6FrGzbK3XqxXlEyvClZ\\nrQj8AnMInuHLXGKFoygEM+wTvaD79km4/dXl50l2mQKBgQCYmoU66V3rLxuYWhHV\\nhJiCDOhISV6YEfVOzAK2TEfUUHZypK1l3f+y2YoHYUfpWLI+2VVGBf7/jmuIkweB\\nRcSal1t6YnL2B/OwDrwCoB8tBNkQAG66VGJbXynwkGd0+KCsuOMZhSufsJDqRcUI\\njrP/RokGXbMTLMnVHYFhsTnXkQ==\\n-----END PRIVATE KEY-----\\n",
-  "client_email": "csinokvs@kvs-kasik.iam.gserviceaccount.com",
-  "client_id": "103287774838679768904",
+  "project_id": "kvs-casino",
+  "private_key_id": "60dd8b97cbc10009e0171a2cf315161444ddd942",
+  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC0X/Tt72Syi2Hv\\nfiUTK/POUfzA6eZTEepI1BpQIZSiaH5Fqw1Mg0eOJu0OJA2apx/RCZFXZ9E9ts5H\\n90LbocsNFns26S6w/mTACw3DgQqCvvcDO9tcBLxTXUzGWWRXr4gH+19eRxJrTBYU\\n+v0ngosfTk4C6BatopT3njt5XxI1U+6cLYcGIFzSUW8A1jiidO/enOktSHf2rvuu\\nCpR0yoxmkLE7L5vjof1C2M5qlDPGSv4w//u20kF8DTEFl9GC85qP7xtlCZIPpzp3\\nhyrS4DaXYWqrEapbVDCyyKFp/8/T+Wkg+ZFkha9GpONg/k1WrIV1mul9LVYHkAWI\\nK3pDNWu7AgMBAAECggEAK3fCbUKXOEXJtK7oHV4ms45jhFP5uwQiuylOLAhjqt3W\\nrFBj9I/ggxvTXeiHVME4tCYDnhY5QQ+YV5R5SreLWNyVle6M33925SbkyrwCve5q\\nVZ+rpdnITqi500UAnvcAp7fGzFABWtUrryOrNUXK5CD5QM8QhAidsKyztXSZTTtE\\nqeIrbn+plKdQPS7AK94iykD+b1uj0hdLlTy9NdwkiYiLklTe7ljt/ZhhKs+saQuY\\nMniApCBnIsYBqBX3MnjuHQ3vPmeV/tWDSqt2Y72RrCBnTcIJhgraEnfH/xTOwTOa\\nPf4ZEehQy5ahBZrAy9pqVXYWK4eKnqwfmxiN1PFEsQKBgQDfzoiGq77+ohm0B2bd\\n6M7LfLH61fXbf/lOeyZpMwMr2yh3XmjHwAHzaVE9gzcGvYKNUdvYDp6mTmDGmlqv\\nCvMcBv6qRD9isKKioVqNSSaRzzjQ0lBJwZx4+rgfftS+rs1rci9pJdR7MEvrdRKO\\nOxAZnAAmmAXfirjCwTlgIDtkUQKBgQDOUhWiTfZrGAb1aJkL/LGAkOU9EECTV6Bs\\naPv5GJG+F9WOLTMV7cOlBR5COrTGYtEgBvbEloZVa1S7sLnFTJ2ufXZbhAZ3+0hY\\ndKfWNc1+RhQbBfcllNteML6N6mjZ2wA4Ct5eexTYovSZawuRGKhS7Bm75BCQnxx8\\nX3rT70SISwKBgBZPW1K5aiet9wv4NOvoGj00p/VOQNzpq+uD4TdZa3aCuUz071MC\\nM++UzxFntCOK3qnBwD2Qb4Y6h/EkT+flGojvtZE5jmwDGaNGnGU7JoogcxR18qT3\\nlOaGb7ZMCV8cw8NzNYCw0baaAOdu2zOsdZVn9KfkPamkBXj8lACeFe2RAoGAcQmj\\n9LKGKZKWbWoLP/gIQAoirlvzJUbDC+JQ+t6tKtrgE+9Lp94GbKjrNRn45SBKtyNZ\\nm8dkffQ6DkL65M/fLDRs3iLtcFrp/hybv87mcSJv7YZNK/fsYCSQoiwlmgZUjl/W\\nCSmh+Db/j/aH9czum8/jIYAIW1PxRWsCXo8emxUCgYAPqXF0EbCoQowjfecGWKM0\\njObcquSY8wV7fJmq8ZuMpXY2+5PTuyJjZ7u/Xf4yraaL4+UL6uwQ4W/3Xbku7v+5\\nw8EPAab894p4+ZpXMgWKMiZSSCmRnF0Qvr9S674zp28rbnAMBoK+mnOy/UZ+3moC\\n3Vu3UbD80f2hq+b0gAgG3A==\\n-----END PRIVATE KEY-----\\n",
+  "client_email": "kasik-416@kvs-casino.iam.gserviceaccount.com",
+  "client_id": "106386327390576095601",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/csinokvs%40kvs-kasik.iam.gserviceaccount.com",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/kasik-416%40kvs-casino.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 }'''
 # =====================================
