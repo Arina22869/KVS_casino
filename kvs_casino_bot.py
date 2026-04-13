@@ -188,8 +188,9 @@ async def cmd_casino(m: Message):
     ])
     await m.answer(text, reply_markup=keyboard)
 
-@dp.message(F.web_app_data)
 async def handle_webapp(m: Message):
+    logging.info(f"🔥🔥🔥 ПОЛУЧЕНЫ ДАННЫЕ: {m.web_app_data.data}")  # ЭТО ВАЖНО
+    # ... остальной код
     data = json.loads(m.web_app_data.data)
     user_id = m.from_user.id
     
