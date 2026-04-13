@@ -5,7 +5,6 @@ import asyncio
 import json
 import os
 from contextlib import contextmanager
-from datetime import datetime
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
@@ -17,16 +16,8 @@ TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("❌ BOT_TOKEN не найден! Добавьте переменную окружения BOT_TOKEN")
 
-SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
-if not SPREADSHEET_ID:
-    raise ValueError("❌ SPREADSHEET_ID не найден в переменных окружения")
+SPREADSHEET_ID = "1uQXxwPm-HkrAD_hErpjtInBFwOaYJtTHkgqqfJ0_6V0"  # ID твоей новой таблицы
 # ================================================
-
-# ============= ВШИТЫЙ КЛЮЧ (можно позже вынести в ENV) =============
-KEY_JSON = os.environ.get("GOOGLE_KEY")
-if not KEY_JSON:
-    raise ValueError("❌ GOOGLE_KEY не найден в переменных окружения")
-# =====================================================
 
 # ============= БАЗА ДАННЫХ SQLite (фриспины) =============
 @contextmanager
@@ -64,17 +55,16 @@ def update_freespins(user_id, delta):
 # ============= GOOGLE SHEETS (кэш) =============
 def get_gs_client():
     try:
-        creds = Credentials.from_service_account_info(json.loads(KEY_JSON), scopes=[
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive"
-        ])
+        creds = Credentials.from_service_account_file(
+            'google_key(3).json',  # <--- имя твоего файла
+            scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+        )
         return gspread.authorize(creds)
     except Exception as e:
         logging.error(f"❌ Ошибка подключения: {e}")
         return None
 
 def sync_users_from_google():
-    """Фоновая синхронизация таблицы в кэш SQLite"""
     client = get_gs_client()
     if not client:
         return
@@ -104,7 +94,6 @@ def get_user_coins(user_id):
         return row[0] if row else 0
 
 def update_user_coins(user_id, new_value):
-    """Мгновенно обновляет кэш, в Google отправляет в фоне"""
     with get_db() as conn:
         conn.execute("UPDATE users_cache SET cur_pts=? WHERE user_id=?", (new_value, user_id))
         if conn.rowcount == 0:
@@ -126,7 +115,7 @@ def update_user_coins(user_id, new_value):
                     row_num = i
                     break
             if row_num:
-                sheet.update_cell(row_num, 4, str(new_value))  # колонка D (cur_pts)
+                sheet.update_cell(row_num, 4, str(new_value))
             else:
                 sheet.append_row([uid_str, "Новый", "Активист", str(new_value)])
             logging.info(f"✅ Google обновлён: {user_id} -> {new_value}")
@@ -196,21 +185,15 @@ async def handle_webapp(m: Message):
         coins = get_user_coins(user_id)
         spins = get_freespins(user_id)
         
-        # проверка возможности крутить
         if coins < 5 and spins == 0:
             await m.answer(json.dumps({"type": "result", "prizeText": "❌ Не хватает коинов (нужно 5)"}))
             return
         
-        # списание
         if spins > 0:
-            new_spins = update_freespins(user_id, -1)
-            cost_msg = "🎡 использован фриспин"
+            update_freespins(user_id, -1)
         else:
-            new_coins = coins - 5
-            update_user_coins(user_id, new_coins)
-            cost_msg = "💰 списано 5 коинов"
+            update_user_coins(user_id, coins - 5)
         
-        # определяем выигрыш
         prize = get_prize()
         final_coins = get_user_coins(user_id)
         final_spins = get_freespins(user_id)
