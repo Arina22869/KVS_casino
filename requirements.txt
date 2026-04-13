@@ -1,5 +1,4 @@
 aiogram
 gspread
-google-auth>=2.35.0
-cryptography>=42.0.0
+google-auth
 requests
