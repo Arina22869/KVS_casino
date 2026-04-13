@@ -16,7 +16,7 @@ TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("❌ BOT_TOKEN не найден! Добавьте переменную окружения BOT_TOKEN")
 
-SPREADSHEET_ID = "1uQXxwPm-HkrAD_hErpjtInBFwOaYJtTHkgqqfJ0_6V0"  # ID твоей новой таблицы
+SPREADSHEET_ID = "1uQXxwPm-HkrAD_hErpjtInBFwOaYJtTHkgqqfJ0_6V0"
 # ================================================
 
 # ============= БАЗА ДАННЫХ SQLite (фриспины) =============
@@ -52,11 +52,15 @@ def update_freespins(user_id, delta):
         conn.commit()
         return new_val
 
-# ============= GOOGLE SHEETS (кэш) =============
+# ============= GOOGLE SHEETS (без файла, только переменная) =============
 def get_gs_client():
     try:
-        creds = Credentials.from_service_account_file(
-            'google_key(3).json',  # <--- имя твоего файла
+        KEY_JSON = os.environ.get("GOOGLE_KEY")
+        if not KEY_JSON:
+            raise ValueError("❌ GOOGLE_KEY не найден в переменных окружения")
+        creds_dict = json.loads(KEY_JSON)
+        creds = Credentials.from_service_account_info(
+            creds_dict,
             scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
         )
         return gspread.authorize(creds)
