@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Колесо удачи | КВС</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: #282826;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            padding: 16px;
+        }
+        .casino-card {
+            background: #1a1a1a;
+            border-radius: 48px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+            border: 1px solid #B20B13;
+        }
+        h2 {
+            color: #FFFFFF;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 5px #B20B13;
+        }
+        .balance {
+            background: #00000099;
+            border-radius: 60px;
+            padding: 8px 18px;
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #F0F0F0;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 1px solid #B20B13;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            background: #2a2a2a;
+            border-radius: 50%;
+            box-shadow: 0 0 0 8px #B20B13, 0 12px 28px black;
+        }
+        .spin-btn {
+            background: #B20B13;
+            border: none;
+            padding: 14px 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 60px;
+            width: 80%;
+            margin-top: 24px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #5a0505;
+            transition: 0.07s linear;
+        }
+        .spin-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #5a0505;
+        }
+        .result {
+            margin-top: 20px;
+            background: #000000aa;
+            border-radius: 40px;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 1.8rem;
+            color: #FFFFFF;
+            text-shadow: 0 0 5px #B20B13;
+            border: 1px solid #B20B13;
+        }
+        button:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<div class="casino-card">
+    <h2>🎡 КВС‑КАЗИНО</h2>
+    <div class="balance">💰 Баланс: <span id="balance">—</span> КВС‑коинов</div>
+    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+    <button class="spin-btn" id="spinButton">🌀 КРУТИТЬ (5 коинов)</button>
+    <div class="result" id="resultArea">Нажми «Крутить»</div>
+</div>
+
+<script>
+    let canvas = document.getElementById('wheelCanvas');
+    let ctx = canvas.getContext('2d');
+    let spinBtn = document.getElementById('spinButton');
+    let resultDiv = document.getElementById('resultArea');
+    let balanceSpan = document.getElementById('balance');
+
+    let userBalance = 0;
+    let userFreespins = 0;
+    let isSpinning = false;
+    let currentAngle = 0;
+    let tg = window.Telegram?.WebApp;
+
+    // Цвета: серый, белый, бордовый, чёрный
+    const COLORS = ["#F0F0F0", "#FFFFFF", "#B20B13", "#282826", "#F0F0F0", "#B20B13", "#282826", "#FFFFFF"];
+    const SECTOR_NAMES = ["10", "5", "2", "0", "20", "🍾", "💋", "0"];
+    
+    function drawWheel() {
+        const size = canvas.width;
+        const center = size/2;
+        const radius = size/2 - 6;
+        const angleStep = (Math.PI * 2) / COLORS.length;
+        for (let i = 0; i < COLORS.length; i++) {
+            const start = i * angleStep + currentAngle;
+            const end = (i+1) * angleStep + currentAngle;
+            ctx.beginPath();
+            ctx.moveTo(center, center);
+            ctx.arc(center, center, radius, start, end);
+            ctx.fillStyle = COLORS[i];
+            ctx.fill();
+            ctx.save();
+            ctx.translate(center, center);
+            ctx.rotate(start + angleStep/2);
+            ctx.fillStyle = (COLORS[i] === "#B20B13" || COLORS[i] === "#282826") ? "#FFFFFF" : "#000000";
+            ctx.font = "bold 22px 'Segoe UI'";
+            ctx.shadowBlur = 0;
+            ctx.fillText(SECTOR_NAMES[i], radius * 0.7, 8);
+            ctx.restore();
+        }
+        ctx.fillStyle = "#B20B13";
+        ctx.beginPath();
+        ctx.moveTo(center + 20, 12);
+        ctx.lineTo(center - 20, 12);
+        ctx.lineTo(center, 38);
+        ctx.fill();
+    }
+
+    function animateSpin(duration, targetRotations, callback) {
+        const startAngle = currentAngle;
+        const startTime = performance.now();
+        function animate(now) {
+            let elapsed = now - startTime;
+            let progress = Math.min(1, elapsed / duration);
+            let easeOut = 1 - Math.pow(1 - progress, 3);
+            currentAngle = startAngle + targetRotations * easeOut;
+            drawWheel();
+            if (progress < 1) requestAnimationFrame(animate);
+            else if (callback) callback();
+        }
+        requestAnimationFrame(animate);
+    }
+
+    async function spin() {
+        if (isSpinning) return;
+        if (userBalance < 5 && userFreespins === 0) {
+            resultDiv.innerText = "❌ Не хватает коинов (нужно 5)";
+            return;
+        }
+        isSpinning = true;
+        spinBtn.disabled = true;
+        resultDiv.innerText = "🎲 Крутим...";
+        
+        if (tg) tg.sendData(JSON.stringify({ type: "spin" }));
+        else {
+            setTimeout(() => finishSpin({ prizeText: "5 коинов", newBalance: userBalance + 5, newFreespins: userFreespins }), 1500);
+        }
+    }
+    
+    function finishSpin(data) {
+        let randomSector = Math.floor(Math.random() * COLORS.length);
+        let targetAngle = (Math.PI * 2) * (randomSector / COLORS.length) + Math.PI * 8;
+        animateSpin(800, targetAngle, () => {
+            resultDiv.innerHTML = `✨ ВЫИГРЫШ: ${data.prizeText} ✨`;
+            if (data.newBalance !== undefined) userBalance = data.newBalance;
+            if (data.newFreespins !== undefined) userFreespins = data.newFreespins;
+            balanceSpan.innerText = `${userBalance} (фриспины: ${userFreespins})`;
+            isSpinning = false;
+            spinBtn.disabled = false;
+        });
+    }
+
+    if (tg) {
+        tg.ready();
+        tg.expand();
+        tg.sendData(JSON.stringify({ type: "getBalance" }));
+    } else {
+        userBalance = 50;
+        userFreespins = 1;
+        balanceSpan.innerText = `${userBalance} (фриспины: ${userFreespins})`;
+    }
+
+    window.addEventListener('message', (e) => {
+        try {
+            let data = JSON.parse(e.data);
+            if (data.type === "balance") {
+                userBalance = data.balance;
+                userFreespins = data.freespins;
+                balanceSpan.innerText = `${userBalance} (фриспины: ${userFreespins})`;
+            }
+            if (data.type === "result") finishSpin(data);
+        } catch(_) {}
+    });
+
+    spinBtn.onclick = spin;
+    drawWheel();
+</script>
+</body>
+</html>
