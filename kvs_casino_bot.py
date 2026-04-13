@@ -14,15 +14,15 @@ from google.oauth2.service_account import Credentials
 # ============= ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ =============
 TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден! Добавьте переменную окружения BOT_TOKEN")
+    raise ValueError("❌ BOT_TOKEN не найден")
 
 SPREADSHEET_ID = "1uQXxwPm-HkrAD_hErpjtInBFwOaYJtTHkgqqfJ0_6V0"
 # ================================================
 
-# ============= БАЗА ДАННЫХ SQLite (фриспины) =============
+# ============= SQLite (фриспины + кэш) =============
 @contextmanager
 def get_db():
-    conn = sqlite3.connect('freespins.db', timeout=10)
+    conn = sqlite3.connect('kvs_casino.db', timeout=10)
     try:
         yield conn
     finally:
@@ -30,7 +30,10 @@ def get_db():
 
 def init_db():
     with get_db() as conn:
+        # Таблица для фриспинов
         conn.execute('CREATE TABLE IF NOT EXISTS freespins (user_id INTEGER PRIMARY KEY, spins INTEGER DEFAULT 0)')
+        # Таблица для кэша пользователей
+        conn.execute('CREATE TABLE IF NOT EXISTS users_cache (user_id INTEGER PRIMARY KEY, name TEXT, cur_pts INTEGER DEFAULT 0)')
         conn.commit()
 
 def get_freespins(user_id):
@@ -52,7 +55,7 @@ def update_freespins(user_id, delta):
         conn.commit()
         return new_val
 
-# ============= GOOGLE SHEETS (без файла, только переменная) =============
+# ============= GOOGLE SHEETS (только переменная окружения) =============
 def get_gs_client():
     try:
         KEY_JSON = os.environ.get("GOOGLE_KEY")
@@ -69,6 +72,7 @@ def get_gs_client():
         return None
 
 def sync_users_from_google():
+    """Фоновая синхронизация таблицы в кэш"""
     client = get_gs_client()
     if not client:
         return
@@ -98,6 +102,7 @@ def get_user_coins(user_id):
         return row[0] if row else 0
 
 def update_user_coins(user_id, new_value):
+    """Мгновенно обновляет кэш, в Google отправляет в фоне"""
     with get_db() as conn:
         conn.execute("UPDATE users_cache SET cur_pts=? WHERE user_id=?", (new_value, user_id))
         if conn.rowcount == 0:
