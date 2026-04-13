@@ -184,7 +184,7 @@ async def cmd_casino(m: Message):
             f"Крути за 5 коинов!")
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url="https://69dd67a7ef51305fec72e9c2--lucky-crostata-dd5fd1.netlify.app/"))]
+        [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url="https://69dd69f42dc0716aa46304b7--rainbow-youtiao-504e10.netlify.app/"))]
     ])
     await m.answer(text, reply_markup=keyboard)
 
