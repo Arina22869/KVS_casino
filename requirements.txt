@@ -3,3 +3,4 @@ gspread
 google-auth
 requests
 flask
+flask-cors
