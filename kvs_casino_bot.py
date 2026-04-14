@@ -20,7 +20,7 @@ if not TOKEN:
 
 SPREADSHEET_ID = "1uQXxwPm-HkrAD_hErpjtInBFwOaYJtTHkgqqfJ0_6V0"
 
-# ============= НОВЫЙ КЛЮЧ =============
+# ============= КЛЮЧ =============
 KEY_JSON = '''{
   "type": "service_account",
   "project_id": "kvs-casino",
@@ -70,14 +70,14 @@ def update_freespins(user_id, delta):
         conn.commit()
         return new_val
 
-# ============= GOOGLE SHEETS (встроенный ключ) =============
+# ============= GOOGLE SHEETS =============
 def get_gs_client():
     try:
         creds_dict = json.loads(KEY_JSON)
-        creds = Credentials.from_service_account_info(
-            creds_dict,
-            scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-        )
+        creds = Credentials.from_service_account_info(creds_dict, scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ])
         return gspread.authorize(creds)
     except Exception as e:
         logging.error(f"❌ Ошибка подключения: {e}")
@@ -137,7 +137,7 @@ def update_user_coins(user_id, new_value):
                 sheet.update_cell(row_num, 4, str(new_value))
             else:
                 sheet.append_row([uid_str, "Новый", "Активист", str(new_value)])
-            logging.info(f"✅ Google обновлен: {user_id} -> {new_value}")
+            logging.info(f"✅ Google обновлён: {user_id} -> {new_value}")
         except Exception as e:
             logging.error(f"❌ Ошибка обновления Google: {e}")
     
@@ -161,11 +161,11 @@ def get_prize():
     else:
         return {"type": "coins", "delta": 0, "text": "0 коинов"}
 
-# ============= HTTP-сервер =============
+# ============= FLASK =============
 app = Flask(__name__)
 
 @app.route('/balance/<int:user_id>', methods=['GET'])
-def get_balance(user_id):
+def balance_route(user_id):
     coins = get_user_coins(user_id)
     spins = get_freespins(user_id)
     return jsonify({"balance": coins, "freespins": spins})
@@ -227,11 +227,11 @@ async def cmd_casino(m: Message):
             f"🎡 Фриспинов: {freespins}\n\n"
             f"Крути за 5 коинов!")
     
-    # Ссылка на твой HTML на Netlify (замени на свою)
-    html_url = "https://69de2a2973d82a10b5d7c363--effulgent-tulumba-a161d4.netlify.app/"
+    # Используем прямой URL бота (замени на свой адрес Bothost)
+    bot_url = "https://твой-бот.bothost.net"
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url=html_url))]
+        [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url=bot_url))]
     ])
     await m.answer(text, reply_markup=keyboard)
 
