@@ -228,7 +228,7 @@ async def cmd_casino(m: Message):
             f"Крути за 5 коинов!")
     
     # Ссылка на твой HTML на Netlify (замени на свою)
-    html_url = "https://твой-проект.netlify.app"
+    html_url = "https://69de2a2973d82a10b5d7c363--effulgent-tulumba-a161d4.netlify.app/"
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url=html_url))]
