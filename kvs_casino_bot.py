@@ -10,8 +10,6 @@ from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 import gspread
 from google.oauth2.service_account import Credentials
-from flask import Flask, request, jsonify
-import threading
 
 # ============= ПЕРЕМЕННЫЕ =============
 TOKEN = os.environ.get("BOT_TOKEN")
@@ -161,51 +159,6 @@ def get_prize():
     else:
         return {"type": "coins", "delta": 0, "text": "0 коинов"}
 
-# ============= FLASK =============
-from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app)  # разрешаем запросы с любых доменов
-
-@app.route('/balance/<int:user_id>', methods=['GET'])
-def balance_route(user_id):
-    coins = get_user_coins(user_id)
-    spins = get_freespins(user_id)
-    return jsonify({"balance": coins, "freespins": spins})
-
-@app.route('/spin/<int:user_id>', methods=['POST'])
-def spin_route(user_id):
-    coins = get_user_coins(user_id)
-    spins = get_freespins(user_id)
-    
-    if coins < 5 and spins == 0:
-        return jsonify({"error": "Не хватает коинов"}), 400
-    
-    if spins > 0:
-        update_freespins(user_id, -1)
-    else:
-        update_user_coins(user_id, coins - 5)
-    
-    prize = get_prize()
-    final_coins = get_user_coins(user_id)
-    final_spins = get_freespins(user_id)
-    
-    if prize["type"] == "coins":
-        final_coins += prize["delta"]
-        update_user_coins(user_id, final_coins)
-    elif prize["type"] == "freespin":
-        final_spins += prize["delta"]
-        update_freespins(user_id, prize["delta"])
-    
-    return jsonify({
-        "prizeText": prize["text"],
-        "newBalance": final_coins,
-        "newFreespins": final_spins
-    })
-
-def run_flask():
-    app.run(host='0.0.0.0', port=8080)
-
 # ============= БОТ =============
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
@@ -230,12 +183,55 @@ async def cmd_casino(m: Message):
             f"🎡 Фриспинов: {freespins}\n\n"
             f"Крути за 5 коинов!")
     
-    bot_url = "https://69de31fc163ceb28d0e76d59--flourishing-taffy-7bdbf9.netlify.app/"
+    # Ссылка на твой HTML на Netlify
+    bot_url = "https://69de36dc724279247aa8fd71--tubular-truffle-90dbc3.netlify.app/"
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url=bot_url))]
     ])
     await m.answer(text, reply_markup=keyboard)
+
+@dp.message(F.web_app_data)
+async def handle_webapp(m: Message):
+    logging.info(f"🔥🔥🔥 ПОЛУЧЕНЫ ДАННЫЕ: {m.web_app_data.data}")
+    data = json.loads(m.web_app_data.data)
+    user_id = m.from_user.id
+    
+    if data["type"] == "getBalance":
+        coins = get_user_coins(user_id)
+        spins = get_freespins(user_id)
+        await m.answer(json.dumps({"type": "balance", "balance": coins, "freespins": spins}))
+        
+    elif data["type"] == "spin":
+        coins = get_user_coins(user_id)
+        spins = get_freespins(user_id)
+        
+        if coins < 5 and spins == 0:
+            await m.answer(json.dumps({"type": "result", "prizeText": "❌ Не хватает коинов (нужно 5)"}))
+            return
+        
+        if spins > 0:
+            update_freespins(user_id, -1)
+        else:
+            update_user_coins(user_id, coins - 5)
+        
+        prize = get_prize()
+        final_coins = get_user_coins(user_id)
+        final_spins = get_freespins(user_id)
+        
+        if prize["type"] == "coins":
+            final_coins += prize["delta"]
+            update_user_coins(user_id, final_coins)
+        elif prize["type"] == "freespin":
+            final_spins += prize["delta"]
+            update_freespins(user_id, prize["delta"])
+        
+        await m.answer(json.dumps({
+            "type": "result",
+            "prizeText": prize["text"],
+            "newBalance": final_coins,
+            "newFreespins": final_spins
+        }))
 
 # ============= ФОН =============
 async def bg_sync():
@@ -250,10 +246,6 @@ async def main():
     init_db()
     sync_users_from_google()
     asyncio.create_task(bg_sync())
-    
-    # Запускаем Flask в отдельном потоке
-    threading.Thread(target=run_flask, daemon=True).start()
-    
     print("🚀 КВС‑Казино запущен!")
     await dp.start_polling(bot)
 
