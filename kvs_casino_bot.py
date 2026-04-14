@@ -162,7 +162,10 @@ def get_prize():
         return {"type": "coins", "delta": 0, "text": "0 коинов"}
 
 # ============= FLASK =============
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)  # разрешаем запросы с любых доменов
 
 @app.route('/balance/<int:user_id>', methods=['GET'])
 def balance_route(user_id):
