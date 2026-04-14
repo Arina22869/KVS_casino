@@ -227,7 +227,7 @@ async def cmd_casino(m: Message):
             f"🎡 Фриспинов: {freespins}\n\n"
             f"Крути за 5 коинов!")
     
-    bot_url = "https://bot_1776110705_6208_arina22869.bothost.net"
+    bot_url = "https://69de31fc163ceb28d0e76d59--flourishing-taffy-7bdbf9.netlify.app/"
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url=bot_url))]
