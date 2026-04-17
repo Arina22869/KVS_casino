@@ -4,12 +4,14 @@ import random
 import asyncio
 import json
 import os
+import threading
 from contextlib import contextmanager
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 import gspread
 from google.oauth2.service_account import Credentials
+from flask import Flask, request, jsonify
 
 # ============= ПЕРЕМЕННЫЕ =============
 TOKEN = os.environ.get("BOT_TOKEN")
@@ -159,6 +161,48 @@ def get_prize():
     else:
         return {"type": "coins", "delta": 0, "text": "0 коинов"}
 
+# ============= FLASK =============
+app = Flask(__name__)
+
+@app.route('/balance/<int:user_id>', methods=['GET'])
+def balance_route(user_id):
+    coins = get_user_coins(user_id)
+    spins = get_freespins(user_id)
+    return jsonify({"balance": coins, "freespins": spins})
+
+@app.route('/spin/<int:user_id>', methods=['POST'])
+def spin_route(user_id):
+    coins = get_user_coins(user_id)
+    spins = get_freespins(user_id)
+    
+    if coins < 5 and spins == 0:
+        return jsonify({"error": "Не хватает коинов"}), 400
+    
+    if spins > 0:
+        update_freespins(user_id, -1)
+    else:
+        update_user_coins(user_id, coins - 5)
+    
+    prize = get_prize()
+    final_coins = get_user_coins(user_id)
+    final_spins = get_freespins(user_id)
+    
+    if prize["type"] == "coins":
+        final_coins += prize["delta"]
+        update_user_coins(user_id, final_coins)
+    elif prize["type"] == "freespin":
+        final_spins += prize["delta"]
+        update_freespins(user_id, prize["delta"])
+    
+    return jsonify({
+        "prizeText": prize["text"],
+        "newBalance": final_coins,
+        "newFreespins": final_spins
+    })
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8080)
+
 # ============= БОТ =============
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
@@ -183,8 +227,7 @@ async def cmd_casino(m: Message):
             f"🎡 Фриспинов: {freespins}\n\n"
             f"Крути за 5 коинов!")
     
-    # Ссылка на твой HTML на Netlify
-    bot_url = "https://69de36dc724279247aa8fd71--tubular-truffle-90dbc3.netlify.app/"
+    bot_url = "https://69e1ff3ad0a92eba6835f1ce--voluble-squirrel-956ffa.netlify.app/"
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎡 Открыть Колесо", web_app=WebAppInfo(url=bot_url))]
@@ -193,7 +236,7 @@ async def cmd_casino(m: Message):
 
 @dp.message(F.web_app_data)
 async def handle_webapp(m: Message):
-    logging.info(f"🔥🔥🔥 ПОЛУЧЕНЫ ДАННЫЕ: {m.web_app_data.data}")
+    logging.info(f"🔥 ПОЛУЧЕНЫ ДАННЫЕ: {m.web_app_data.data}")
     data = json.loads(m.web_app_data.data)
     user_id = m.from_user.id
     
@@ -246,6 +289,10 @@ async def main():
     init_db()
     sync_users_from_google()
     asyncio.create_task(bg_sync())
+    
+    # Запускаем Flask в отдельном потоке
+    threading.Thread(target=run_flask, daemon=True).start()
+    
     print("🚀 КВС‑Казино запущен!")
     await dp.start_polling(bot)
 
