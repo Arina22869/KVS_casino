@@ -12,6 +12,8 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, W
 import gspread
 from google.oauth2.service_account import Credentials
 from flask import Flask, request, jsonify
+from aiohttp import ClientSession
+from aiohttp_socks import ProxyConnector
 
 # ============= ПЕРЕМЕННЫЕ =============
 TOKEN = os.environ.get("BOT_TOKEN")
@@ -205,7 +207,10 @@ def run_flask():
 
 # ============= БОТ =============
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=TOKEN)
+
+# Настройка прокси через Tor
+connector = ProxyConnector.from_url("socks5://127.0.0.1:9050")
+bot = Bot(token=TOKEN, request=ClientSession(connector=connector))
 dp = Dispatcher()
 
 @dp.message(Command("start"))
